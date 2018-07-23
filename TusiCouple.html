@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<h2>Scroll slider to move points</h2>
+
+<div class="slidecontainer">
+  <span>Cyan Point Distance</span><input type="range" min="-125" max="125" value="70" class="slider" id="CyanScroll">
+  <br/>
+  <div>Cyan Point Trace: <span id="cyanTrace"></span></div>
+</div>
+<br />
+<div class="slidecontainer">
+  <span>Red Point Distance</span><input type="range" min="-125" max="125" value="30" class="slider" id="RedScroll">
+  <br/>
+  <div>Red Point Trace: <span id="redTrace"></span</div>
+</div>
+
+<script>
+
+var c = document.getElementById("myCanvas");
+var ctx = c.getContext("2d");
+
+var BigCircleX=250;
+var BigCircleY=250;
+var BigCircleR=250;
+
+var SmallCircleX=375;
+var SmallCircleY=250;
+var SmallCircleR=125;
+
+var DegCount=0;
+
+var t = setInterval(function(){
+	//clear canvas
+	ctx.clearRect(0,0,500,500);
+	
+	ctx.beginPath();
+	ctx.moveTo(250,0);
+	ctx.lineTo(250,500);
+	ctx.strokeStyle="#00F";
+	ctx.stroke();
+
+	ctx.beginPath();
+	ctx.moveTo(0,250);
+	ctx.lineTo(500,250);
+	ctx.strokeStyle="#0F0";
+	ctx.stroke();
+
+	//draw big circle
+	ctx.beginPath();
+	ctx.arc(BigCircleX, BigCircleY, BigCircleR, 0, 2 * Math.PI);
+	ctx.strokeStyle="#000";
+	ctx.stroke();
+	
+	var DegTemp = -DegCount*(Math.PI/180);
+	SmallCircleX = BigCircleX + SmallCircleR*Math.cos(DegTemp);
+	SmallCircleY = BigCircleY + SmallCircleR*Math.sin(DegTemp);
+
+	//draw small circle
+	ctx.beginPath();
+	ctx.arc(SmallCircleX, SmallCircleY, BigCircleR/2, 0, 2 * Math.PI);
+	ctx.strokeStyle="#000";
+	ctx.stroke();
+
+	//draw chord with respect to small circle
+	ctx.beginPath();
+	ctx.moveTo(SmallCircleX + SmallCircleR*Math.cos(DegTemp), SmallCircleY - SmallCircleR*Math.sin(DegTemp));
+	ctx.lineTo(SmallCircleX - SmallCircleR*Math.cos(DegTemp), SmallCircleY + SmallCircleR*Math.sin(DegTemp));
+	ctx.strokeStyle="#000";
+	ctx.stroke();
+
+	//draw planet yellow circle
+	ctx.beginPath();
+	ctx.arc(SmallCircleX + SmallCircleR*Math.cos(DegTemp), SmallCircleY + SmallCircleR*Math.sin(DegTemp), 5, 0, 2 * Math.PI);
+	ctx.fillStyle = "yellow";
+	ctx.fill();
+	ctx.strokeStyle="#f00";
+	ctx.stroke();
+
+	//draw blue point/circle on chord
+	ctx.beginPath();
+	ctx.arc(SmallCircleX - SmallCircleR*Math.cos(DegTemp), SmallCircleY + SmallCircleR*Math.sin(DegTemp), 5, 0, 2 * Math.PI);
+	ctx.fillStyle = "#00f";
+	ctx.fill();
+	ctx.strokeStyle="#00f";
+	ctx.stroke();
+
+	//draw green point/circle on chord
+	ctx.beginPath();
+	ctx.arc(SmallCircleX + SmallCircleR*Math.cos(DegTemp), SmallCircleY - SmallCircleR*Math.sin(DegTemp), 5, 0, 2 * Math.PI);
+	ctx.fillStyle = "#0f0";
+	ctx.fill();	
+	ctx.strokeStyle="#0f0";
+	ctx.stroke();
+
+	var CyanPointX = SmallCircleX + (getCyanScroll("cyan"))*Math.cos(DegTemp);
+	var CyanPointY = SmallCircleY - (getCyanScroll("cyan"))*Math.sin(DegTemp);
+	var RedPointX = SmallCircleX + (getCyanScroll("red"))*Math.cos(DegTemp);
+	var RedPointY = SmallCircleY - (getCyanScroll("red"))*Math.sin(DegTemp);
+
+	//draw cyan point/circle on chord
+	ctx.beginPath();
+	ctx.arc(CyanPointX, CyanPointY, 5, 0, 2 * Math.PI);
+	ctx.fillStyle = "cyan";
+	ctx.fill();	
+	ctx.strokeStyle="cyan";
+	ctx.stroke();
+
+	//draw red point/circle on chord
+	ctx.beginPath();
+	ctx.arc(RedPointX, RedPointY, 5, 0, 2 * Math.PI);
+	ctx.fillStyle = "red";
+	ctx.fill();	
+	ctx.strokeStyle="red";
+	ctx.stroke();
+
+	//Trace Update
+	document.getElementById("cyanTrace").innerHTML = CyanPointX + "," + CyanPointY;
+	document.getElementById("redTrace").innerHTML = RedPointX + "," + RedPointY;
+
+
+	//draw cyan curve Drawing curve here because canvas gets clean 
+	elipseA = Math.abs( (CyanPointX-250)/(Math.cos(DegTemp)) );
+	elipseB = Math.abs( (CyanPointY-250)/(Math.sin(DegTemp)) );
+	ctx.beginPath();
+	ctx.ellipse(BigCircleX,BigCircleY,elipseA,elipseB,0,0,2*Math.PI,1);
+	ctx.strokeStyle = "cyan";
+	ctx.stroke();
+
+	//draw cyan curve
+	elipseA = Math.abs( (RedPointX-250)/(Math.cos(DegTemp)) );
+	elipseB = Math.abs( (RedPointY-250)/(Math.sin(DegTemp)) );
+	ctx.beginPath();
+	ctx.ellipse(BigCircleX,BigCircleY,elipseA,elipseB,0,0,2*Math.PI,1);
+	ctx.strokeStyle = "red";
+	ctx.stroke();
+
+	//inc counter
+	DegCount++;
+
+	//x++;y++;
+},30);
+
+function getCyanScroll(color){
+	if(color == "cyan")
+		return document.getElementById("CyanScroll").value;
+	else
+		return document.getElementById("RedScroll").value;
+
+}
+
+
+</script> 
+
+</body>
+</html>
